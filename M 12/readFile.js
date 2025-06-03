@@ -18,7 +18,7 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const readData = async () => {
     try {
         
-        const finalData = await fs.readFile("./file2.txt", {
+        const finalData = await fs.readFile("./file1.txt", {
           encoding: "utf-8",
         });
         
@@ -32,10 +32,10 @@ const readData = async () => {
 
 readData().then(result => console.log(result))
 
-fscb.writeFile("./file2.txt", "Salam Boro Vai", async(err) => {
-await delay(2000)
-  if (err) {
-    console.error("error to write file");
-  }
-  console.log("file writed");
-});
+// fscb.writeFile("./file2.txt", "Salam Boro Vai", async(err) => {
+// await delay(2000)
+//   if (err) {
+//     console.error("error to write file");
+//   }
+//   console.log("file writed");
+// });
