@@ -1,49 +1,90 @@
-import express, { Application, Request, Response } from 'express'
+import express, { Application, Request, Response } from "express";
 // @ts-ignore\
-import {getAllTodos} from "./lib/utils.js";
-import { json } from 'stream/consumers';
+import { getAllTodos } from "./lib/utils.js";
+import path from "path";
+import fs from "fs";
 // create express app
-const app : Application = express()
+const app: Application = express();
 
-app.use(express.json())
+app.use(express.json());
 
 const todo = JSON.parse(getAllTodos());
-
+const todoPath = path.join(__dirname, "..", "db", "todo.json");
 // home route
-app.get('/', (req : Request, res : Response)=>{
-    res.send("Asalamualikum Brother!!")
-})
+app.get("/", (req: Request, res: Response) => {
+  res.send("Asalamualikum Brother!!");
+});
 
-app.get('/todos', (req : Request, res : Response)=>{
-    res.json(todo)
-})
+app.get("/todos", (req: Request, res: Response) => {
+  res.json(todo);
+});
 
 app.post("/todo/create-todo", (req: Request, res: Response) => {
-    const {title, body} = req.body
-    console.log(title, body);
+  const { title, body } = req.body;
+  console.log(title, body);
 
-    const newTodo = {
-      title,
-      body,
-      createdAt: new Date()
-    };
+  const newTodo = {
+    title,
+    body,
+    createdAt: new Date(),
+  };
 
-    todo.push(newTodo)
+  todo.push(newTodo);
 
-    res.json(newTodo);
+  res.json(newTodo);
 });
 
-app.patch("/todo/update/:id", (req: Request, res: Response) => {
-  res.send("Update todos");
+app.patch("/todo/update/:title", async (req: Request, res: Response) => {
+  const { title } = req.params;
+  const indexOfItem = todo.findIndex(
+    (s_todo: { title: string }) => s_todo.title == title
+  );
+
+  if (indexOfItem === -1) {
+    res.status(404).json({ message: "Todo not found" });
+    return;
+  }
+
+  const filterTodo = todo[indexOfItem];
+  filterTodo.title = req.body.title || filterTodo.title;
+  filterTodo.body = req.body.body || filterTodo.body;
+  filterTodo.createdAt = req.body ? new Date() : filterTodo.createdAt;
+  try {
+    fs.writeFileSync(todoPath, JSON.stringify(todo, null, 2), {
+      encoding: "utf-8",
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to write updated todo to file", error: err });
+    return;
+  }
+  res.json(filterTodo);
 });
 
-app.delete("/todo/delete/:id", (req: Request, res: Response) => {
-  res.send("delete todos");
+app.delete("/todo/delete/:title", async(req: Request, res: Response) => {
+  const { title } = req.params;
+  const indexOfItem = todo.findIndex(
+    (s_todo: { title: string }) => s_todo.title == title
+  );
+
+  if (indexOfItem === -1) {
+    res.status(404).json({ message: "Todo not found" });
+    return;
+  }
+  todo.splice(indexOfItem, 1);
+
+  try {
+    fs.writeFileSync(todoPath, JSON.stringify(todo, null, 2), {
+      encoding: "utf-8",
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to write updated todo to file", error: err });
+    return;
+  }
+  res.send(`${title} deleted`);
 });
 
-
-
-
-
-
-export default app
+export default app;
