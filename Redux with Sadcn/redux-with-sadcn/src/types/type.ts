@@ -1,10 +1,12 @@
 
 
 export interface ITask {
-  id: number;
+  id: string;
   title: string;
   description: string;
   priority: "low" | "medium" |"high"
-  dueDate: string;
+  dueDate: Date;
   createdAt: Date
 }
+
+export type DraftTask = Pick<ITask, "title" | "description" | "priority" | "dueDate">

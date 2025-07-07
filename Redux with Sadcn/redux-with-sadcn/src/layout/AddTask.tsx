@@ -34,28 +34,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { addTask } from "@/redux/features/todos/todoSlice";
+import { useAppDispatch } from "@/redux/hook";
+import type { DraftTask } from "@/types/type";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+
 
 export function AddTask() {
+  const [calenderOpaen, setCalenderOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const dispatch = useAppDispatch()
+  const form = useForm<DraftTask>();
 
-  const [calenderOpaen, setCalenderOpen] = useState(false)
-  const [dialogOpen, setDialogOpen] = useState(false)
-
-  const form = useForm();
-
-  const onsubmit = (data: any) => {
+  const onsubmit = (data: DraftTask) => {
+    dispatch(addTask({ task: data }));
     console.log(data);
-    form.reset()
-    setDialogOpen(false)
+    form.reset();
+    setDialogOpen(false);
   };
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" onClick={()=> setDialogOpen(true)}>Add Task</Button>
+        <Button variant="outline" onClick={() => setDialogOpen(true)}>
+          Add Task
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
