@@ -43,43 +43,47 @@ const initialState: IinitilizeTodo = {
   ],
 };
 
-// 
-const createSanitizeTask =(draftTask:DraftTask)=>{
+//
+const createSanitizeTask = (draftTask: DraftTask) => {
   return {
     id: nanoid(),
     createdAt: new Date(),
-    ...draftTask
-  }
-}
-
+    updatedAt: new Date(),
+    ...draftTask,
+  };
+};
 
 const todoSlice = createSlice({
   name: "task",
   initialState,
   reducers: {
-    addTask: (state, action: PayloadAction<{task:DraftTask}>) => {
-      const finalTask = createSanitizeTask(action.payload.task)
+    addTask: (state, action: PayloadAction<{ task: DraftTask }>) => {
+      const finalTask = createSanitizeTask(action.payload.task);
       state.task.push(finalTask);
     },
-    updateTask: (state, action: PayloadAction<{ id: string; updatedTask: Partial<ITask>}>) => {
+    updateTask: (
+      state,
+      action: PayloadAction<{ id: string; updatedTask: Partial<ITask> }>
+    ) => {
       const { id, updatedTask } = action.payload;
       const index = state.task.findIndex((task) => task.id === id);
       if (index !== -1) {
         state.task[index] = {
           ...state.task[index],
           ...updatedTask,
+          updatedAt: new Date(),
         };
       }
     },
-    deleteTask : (state, action: PayloadAction<{id: string}>)=>{
-      state.task = state.task.filter((todo) => todo.id != action.payload.id)
+    deleteTask: (state, action: PayloadAction<{ id: string }>) => {
+      state.task = state.task.filter((todo) => todo.id != action.payload.id);
     },
   },
 });
 
-export const selectTask = (state : RootState) => {
-    return state.todos.task
-}
+export const selectTask = (state: RootState) => {
+  return state.todos.task;
+};
 
 export const { addTask, updateTask, deleteTask } = todoSlice.actions;
 export default todoSlice.reducer;
