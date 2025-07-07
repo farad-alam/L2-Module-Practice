@@ -59,7 +59,7 @@ export function AddTask() {
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" onClick={() => setDialogOpen(true)}>
-          Add Task
+          Add New Task
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
